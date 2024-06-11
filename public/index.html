@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        form div {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #dataList {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .data-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .data-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Form</h1>
+    <form id="dataForm">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+    <h2>Stored Data</h2>
+    <button id="fetchDataBtn">Fetch Data</button>
+    <div id="dataList"></div>
+
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const age = document.getElementById('age').value;
+
+            const response = await fetch('http://localhost:3000/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, age })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert('Data added successfully!');
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+
+            document.getElementById('dataForm').reset();
+        });
+
+        document.getElementById('fetchDataBtn').addEventListener('click', async function() {
+            const response = await fetch('http://localhost:3000/data');
+            const data = await response.json();
+
+            const dataList = document.getElementById('dataList');
+            dataList.innerHTML = '';
+
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'data-item';
+                div.textContent = `Name: ${item.name}, Email: ${item.email}, Age: ${item.age}`;
+                dataList.appendChild(div);
+            });
+        });
+    </script>
+</body>
+</html>
